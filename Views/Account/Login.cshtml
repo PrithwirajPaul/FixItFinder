@@ -1,0 +1,173 @@
+﻿@model FixItFinderDemo.Models.User
+@{
+    ViewData["Title"] = "Login";
+}
+
+<head>
+    <style>
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+            color: white;
+        }
+
+        .login-container {
+            background: #3CB371;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+
+            .login-container h1 {
+                color: white;
+                font-size: 28px;
+                margin-bottom: 20px;
+            }
+
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+            .input-group label {
+                display: block;
+                font-size: 16px;
+                margin-bottom: 5px;
+                color: white;
+            }
+
+
+        .radio-group {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+            .radio-group input {
+                display: none;
+            }
+
+            .radio-group label {
+                padding: 10px 20px;
+                border: 2px solid #2E8B57;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: background-color 0.3s, color 0.3s;
+            }
+
+            .radio-group input:checked + label {
+                background-color: #2E8B57;
+                color: white;
+            }
+
+
+        .login-container input {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            background: #2E8B57;
+            color: white;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+
+            .login-container input::placeholder {
+                color: #c1f0c1;
+            }
+
+
+        .login-container button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #2E8B57;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+            .login-container button:hover {
+                background-color: #1d7045;
+            }
+
+
+        .login-link {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+            .login-link a {
+                color: #c1f0c1;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+                .login-link a:hover {
+                    text-decoration: underline;
+                }
+
+        .radio-group {
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+
+
+<div class="login-container">
+
+    <h1>Login</h1>
+    <form asp-action="Login" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="input-group">
+            <label>Select Role:</label>
+            <div class="radio-group">
+                <input type="radio" id="customer" asp-for="Role" value="Customer" required>
+                <label for="customer">Customer</label>
+                <input type="radio" id="service-provider" asp-for="Role" value="Service Provider" required>
+                <label for="service-provider">Service Provider</label>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <input type="email" asp-for="Email" placeholder="Email" required>
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="input-group">
+            <input type="password" asp-for="Password" placeholder="Password" required>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="login-link">
+        Don't have an account?
+        <button class="signup-button" onclick="window.location.href='@Url.Action("SignUp", "Account")'">Sign Up</button>
+    </div>
+</div>
