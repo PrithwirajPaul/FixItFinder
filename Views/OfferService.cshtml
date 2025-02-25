@@ -1,0 +1,90 @@
+﻿
+@{
+}
+<style>
+        body {
+            background-color: black;
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .btn-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .card {
+            background-color: #3CB371;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .card h2 {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .card p {
+            font-size: 14px;
+            color: #2E8B57;
+        }
+    </style>
+
+<div class="container">
+        <h1 class="mb-4">Offer Your Services</h1>
+        <div class="grid">
+            <div class="card" onclick="window.location.href='assembly.html'">
+                <h2>Assembling</h2>
+                <p>Hire People Who Will Assemble things for you</p>
+            </div>
+            <div class="card" onclick="window.location.href='mounting.html'">
+                <h2>Mounting</h2>
+                <p>Hire People Who Will Mount and Fix objects for you</p>
+            </div>
+            <div class="card" onclick="window.location.href='cleaning.html'">
+                <h2>Cleaning</h2>
+                <p>Hire People Who Will Clean things for you</p>
+            </div>
+            <div class="card" onclick="window.location.href='houserepairs.html'">
+                <h2>House Repairs</h2>
+                <p>Hire People Who Will Repair things for you</p>
+            </div>
+            <div class="card" onclick="window.location.href='electricians.html'">
+                <h2>Electricians</h2>
+                <p>Hire People Who Will Fix and Install Electric things for you</p>
+            </div>
+            <div class="card" onclick="window.location.href='plumbing.html'">
+                <h2>Plumbing</h2>
+                <p>Hire People Who Will Perform Plumbing jobs for you</p>
+            </div>
+            <div class="card" onclick="window.location.href='painter.html'">
+                <h2>Painter</h2>
+                <p>Hire People Who Will Paint for you</p>
+            </div>
+            <div class="card" onclick="window.location.href='carpenter.html'">
+                <h2>Carpenter</h2>
+                <p>Hire People Who Will Build and Repair Furniture for you</p>
+            </div>
+        </div>
+    </div>
