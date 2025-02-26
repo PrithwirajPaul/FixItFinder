@@ -19,6 +19,18 @@ namespace FixItFinderDemo.Controllers
             return Convert.ToHexStringLower(hashedBytes);
         }
 
+        private List<Post> FetchPosts(string category)
+        {
+            return _context.Posts
+        .Include(p => p.User)
+        .ThenInclude(u => u.Worker_Profile)
+        .Where(p => p.User != null
+                 && p.User.Role == "Service Provider"
+                 && p.User.Worker_Profile != null
+                 && p.User.Worker_Profile.Category == category)
+        .ToList();
+        }
+
         public IActionResult FindAPro()
         {
             return View();
@@ -29,79 +41,89 @@ namespace FixItFinderDemo.Controllers
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
-            var assemblerPosts = await _context.Posts
-                    .Include(p => p.User)
-                    .ThenInclude(u => u.Worker_Profile) 
-                    .Where(p => p.User != null && p.User.Role == "Service Provider" && p.User.Worker_Profile != null && p.User.Worker_Profile.Category == "Electrician")
-                    .ToListAsync();
+            var PostsToShow = FetchPosts("Assembler");
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
 
-            return View(assemblerPosts);
+            return View(PostsToShow);
         }
         public IActionResult MountingPage()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
+            var PostsToShow = FetchPosts("Assembler");
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
-            return View();
+
+            return View(PostsToShow);
         }
         public IActionResult CleaningPage()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
+            var PostsToShow = FetchPosts("Assembler");
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
-            return View();
+
+            return View(PostsToShow);
         }
         public IActionResult RepairPage()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
+            var PostsToShow = FetchPosts("Assembler");
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
-            return View();
+
+            return View(PostsToShow);
         }
-        public IActionResult ElectricPage()
+        public IActionResult ElectritiansPage()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
+            var PostsToShow = FetchPosts("Electrician");
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
-            return View();
+
+            return View(PostsToShow);
         }
         public IActionResult PlumbingPage()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
+            var PostsToShow = FetchPosts("Plumber");
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
-            return View();
+
+            return View(PostsToShow);
         }
         public IActionResult PainterPage()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
+            var PostsToShow = FetchPosts("Painter");
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
-            return View();
+
+            return View(PostsToShow);
         }
         public IActionResult CarpenterPage()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
+            var PostsToShow = FetchPosts("Carpenter");
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
-            return View();
+
+            return View(PostsToShow);
         }
         [HttpGet]
         public IActionResult Login()
