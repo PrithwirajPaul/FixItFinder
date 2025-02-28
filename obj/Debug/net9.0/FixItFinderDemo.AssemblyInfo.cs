@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FixItFinderDemo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b87202784be7cba83070a120bad0f1967f0104da")]
 [assembly: System.Reflection.AssemblyProductAttribute("FixItFinderDemo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FixItFinderDemo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

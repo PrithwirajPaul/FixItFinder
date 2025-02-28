@@ -111,7 +111,11 @@
             {
                 <div class="card">
                     <img src="@post.User.Worker_Profile.Image" alt="@post.User.Name">
-                    <h2>@post.User.Name</h2>
+                    <h2>
+                        <a asp-controller="Profile" asp-action="Index" asp-route-userId="@post.UserId">
+                            @post.User.Name
+                        </a>
+                    </h2>
                     <p>⭐ @post.User.Worker_Profile.Rating (from reviews)</p>
                     <p>@post.Description</p>
                     <p><strong>$@post.Price</strong></p>

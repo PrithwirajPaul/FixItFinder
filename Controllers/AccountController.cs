@@ -37,7 +37,7 @@ namespace FixItFinderDemo.Controllers
         }
         [HttpGet]
         [Route("Account/AssemblyPage")]
-        public async Task<IActionResult> AssemblyPage()
+        public  IActionResult AssemblyPage()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
@@ -52,7 +52,7 @@ namespace FixItFinderDemo.Controllers
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
-            var PostsToShow = FetchPosts("Assembler");
+            var PostsToShow = FetchPosts("Mounter");
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
@@ -63,18 +63,18 @@ namespace FixItFinderDemo.Controllers
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
-            var PostsToShow = FetchPosts("Assembler");
+            var PostsToShow = FetchPosts("Cleaner");
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
 
             return View(PostsToShow);
         }
-        public IActionResult RepairPage()
+        public IActionResult HouseRepairs()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("UserRole");
-            var PostsToShow = FetchPosts("Assembler");
+            var PostsToShow = FetchPosts("Repairer");
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
