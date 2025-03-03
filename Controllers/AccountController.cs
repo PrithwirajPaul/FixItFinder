@@ -151,6 +151,10 @@ namespace FixItFinderDemo.Controllers
                 HttpContext.Session.SetInt32("UserId", user.UId);
                 HttpContext.Session.SetString("UserName", user.Name ?? "Unknown");
                 HttpContext.Session.SetString("UserRole", user.Role);
+                if(user.Role.Equals("Service Provider"))
+                {
+                    HttpContext.Session.SetString("UserCategory", user.Worker_Profile?.Category ?? "Assembler");
+                }
 
                 return RedirectToAction("FindAPro", "Account");
             }
@@ -166,7 +170,7 @@ namespace FixItFinderDemo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignUp(SignUpViewModel model)
         {
-            Console.WriteLine("At start");
+            //Console.WriteLine("At start");
             if (ModelState.IsValid)
             {
                 var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email && u.Role == model.Role);

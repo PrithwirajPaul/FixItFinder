@@ -18,7 +18,9 @@ namespace FixItFinderDemo.Models
         public string? ZipCode { get; set; }
         public string? PhoneNumber { get; set; }
         public List<Post>? Posts { get; set; }
-        public Customer_Profile? Customer_Profile { get; set; } // Add this property
-        public Worker_Profile? Worker_Profile { get; set; } // Add this property
+        public Customer_Profile? Customer_Profile { get; set; } 
+        public Worker_Profile? Worker_Profile { get; set; }
+        public List<Post_Engagement>? PostEngagements { get; set; }
+
     }
 }

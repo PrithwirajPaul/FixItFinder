@@ -98,6 +98,34 @@
         background-color: #40916c;
     }
 
+    .post-status {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: #28a745;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .status-pending {
+        background-color: #f39c12;
+    }
+
+    .status-active {
+        background-color: #28a745;
+    }
+
+    .status-completed {
+        background-color: #3498db;
+    }
+
+    .status-cancelled {
+        background-color: #e74c3c;
+    }
+
     .section-title {
         font-size: 30px;
         font-weight: bold;
@@ -157,6 +185,16 @@
                     <p>⭐ @post.User.Worker_Profile?.Rating (from reviews)</p>
                     <p>@post.Description</p>
                     <p><strong>$@post.Price</strong></p>
+                    <div class="post-status
+                        @(post.Post_Status == 0 ? "status-pending" :
+                          post.Post_Status == 1 ? "status-active" :
+                          post.Post_Status == 2 ? "status-completed" :
+                          "status-cancelled")">
+                        @(post.Post_Status == 0 ? "Pending" :
+                            post.Post_Status == 1 ? "Active" :
+                            post.Post_Status == 2 ? "Completed" :
+                            "Cancelled")
+                    </div>
                 </div>
             }
         </div>

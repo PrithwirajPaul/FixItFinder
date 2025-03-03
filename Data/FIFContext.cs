@@ -14,6 +14,7 @@ namespace FixItFinderDemo.Data
         public DbSet<Service_History> Service_Histories { get; set; }
         public DbSet<Customer_Profile> Customer_Profiles { get; set; }
         public DbSet<Worker_Profile> Worker_Profiles { get; set; }
+        public DbSet<Post_Engagement> Post_Engagements { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,6 +43,17 @@ namespace FixItFinderDemo.Data
                 .HasOne(s => s.Customer)
                 .WithMany(c => c.Service_Histories)
                 .HasForeignKey(s => s.CustomerId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Post_Engagement>()
+                .HasOne(pe => pe.Post)
+                .WithMany(p => p.PostEngagements)
+                .HasForeignKey(pe => pe.PostId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<Post_Engagement>()
+                .HasOne(pe => pe.EngagedUser)
+                .WithMany(u => u.PostEngagements)
+                .HasForeignKey(pe => pe.EngagedUserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
