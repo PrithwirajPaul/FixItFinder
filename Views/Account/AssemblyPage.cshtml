@@ -48,8 +48,6 @@
             font-weight: bold;
         }
 
-        
-
         .card p {
             font-size: 14px;
             color: #2E8B57;
@@ -113,7 +111,11 @@
             {
                 <div class="card">
                     <img src="@post.User.Worker_Profile.Image" alt="@post.User.Name">
-                    <h2>@post.User.Name</h2>
+                    <h2>
+                        <a asp-controller="Profile" asp-action="Index" asp-route-userId="@post.UserId">
+                            @post.User.Name
+                        </a>
+                    </h2>
                     <p>⭐ @post.User.Worker_Profile.Rating (from reviews)</p>
                     <p>@post.Description</p>
                     <p><strong>$@post.Price</strong></p>
@@ -125,8 +127,4 @@
     {
         <p>No posts available.</p>
     }
-
-    <div class="mt-4">
-        <button class="btn btn-success">See All Posts</button>
-    </div>
 </div>

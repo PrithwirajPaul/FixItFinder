@@ -1,4 +1,4 @@
-﻿@model FixItFinderDemo.Models.Post
+﻿@model List<FixItFinderDemo.Models.Post>
 
     <style>
         body {
@@ -43,54 +43,78 @@
             border-radius: 50%;
             margin-bottom: 10px;
         }
+
+    .create-post {
+        background-color: #222;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 40px;
+    }
+
+        .create-post input,
+        .create-post textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .create-post button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 
 <button class="btn-back" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
-@if (ViewBag.role == "Service Provider")
+@if (ViewBag.Role == "Service Provider")
 {
     <div class="create-post">
         <h3>Create a Post</h3>
         <form asp-action="CreatePost" method="post">
             @Html.AntiForgeryToken()
 
-            <textarea asp-for="Description" placeholder="Enter your service description..." required></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
+            <textarea name="Description" placeholder="Enter your service description..." required></textarea>
+            <span asp-validation-for="@Model.FirstOrDefault().Description" class="text-danger"></span>
 
-            <input type="hidden" asp-for="UserId" value=@ViewBag.UserId>
+            <input type="hidden" name="UserId" value="@ViewBag.UserId">
 
-            <input type="number" asp-for="Price" placeholder="Enter the price for your service" required step="0.01">
-            <span asp-validation-for="Price" class="text-danger"></span>
+            <input type="number" name="Price" placeholder="Enter the price for your service" required step="0.01">
+            <span asp-validation-for="@Model.FirstOrDefault().Price" class="text-danger"></span>
 
             <button type="submit">Submit Post</button>
         </form>
     </div>
 }
-    <div class="container">
-        <h2 class="mb-4">Select Your Plumber</h2>
+
+<div class="container">
+    <h2 class="mb-4">Select Your Plumber</h2>
+
+    @if (Model != null && Model.Any())
+    {
         <div class="grid">
-            <div class="card">
-                <img src="photo1.PNG" alt="Zayeed Hasan">
-                <h2>Zayeed Hasan</h2>
-                <p>⭐ 4.8 (24 reviews)</p>
-                <p>I will do your small cleanings for $5.</p>
-                <p><strong>$5</strong></p>
-            </div>
-            <div class="card">
-                <img src="photo2.PNG" alt="Pritwiraj Banik">
-                <h2>Pritwiraj Banik</h2>
-                <p>⭐ 4.5 (18 reviews)</p>
-                <p>I will clean your house and furniture for $500.</p>
-                <p><strong>$500</strong></p>
-            </div>
-            <div class="card">
-                <img src="photo3.PNG" alt="Salim Ullah Sadik">
-                <h2>Salim Ullah Sadik</h2>
-                <p>⭐ 4.9 (32 reviews)</p>
-                <p>Deep cleaning services for $300.</p>
-                <p><strong>$300</strong></p>
-            </div>
+            @foreach (var post in Model)
+            {
+                <div class="card">
+                    <img src="@post.User.Worker_Profile.Image" alt="@post.User.Name">
+                    <h2>
+                        <a asp-controller="Profile" asp-action="Index" asp-route-userId="@post.UserId">
+                            @post.User.Name
+                        </a>
+                    </h2>
+                    <p>⭐ @post.User.Worker_Profile.Rating (from reviews)</p>
+                    <p>@post.Description</p>
+                    <p><strong>$@post.Price</strong></p>
+                </div>
+            }
         </div>
-        <div class="mt-4">
-            <button class="btn btn-success">See All Posts</button>
-        </div>
-    </div>
+    }
+    else
+    {
+        <p>No posts available.</p>
+    }
+</div>

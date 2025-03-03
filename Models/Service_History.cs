@@ -14,4 +14,5 @@ public class Service_History
     [ForeignKey("CustomerId")]
     public Customer_Profile? Customer { get; set; }
     public string? Review { get; set; }
+    public float Rating { get; set; }
 }

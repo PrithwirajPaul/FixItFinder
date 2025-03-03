@@ -1,0 +1,164 @@
+@model FixItFinderDemo.Models.Customer_Profile
+@{
+    var servicesLookingFor = ViewData["ServicesLookingFor"] as List<FixItFinderDemo.Models.Post>;
+    var servicesTaken = ViewData["ServicesTaken"] as List<FixItFinderDemo.Models.Service_History>;
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+    }
+
+    .profile-container {
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .profile-container img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
+
+    .profile-container .info {
+        font-size: 18px;
+        margin: 5px 0;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 16px;
+        text-align: center;
+    }
+
+    .title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 24px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+    }
+
+    .card {
+        background-color: #3CB371;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s;
+    }
+
+    .card:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
+
+    .card h2 {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .card p {
+        font-size: 14px;
+        color: #2E8B57;
+    }
+
+    .btn-primary, .btn-secondary {
+        padding: 12px 24px;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-primary {
+        background-color: #28a745;
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #218838;
+    }
+
+    .btn-secondary {
+        background-color: white;
+        color: #28a745;
+        border: 1px solid #28a745;
+    }
+
+    .btn-secondary:hover {
+        background-color: #e9ecef;
+    }
+</style>
+
+<div class="profile-container">
+    <img src="@Model.Image" alt="Profile Picture">
+
+    <div class="info"><strong>Name:</strong> @Model.User.Name</div>
+    <div class="info"><strong>Email:</strong> @Model.User.Email</div>
+    <div class="info"><strong>Address:</strong> @Model.Bio</div>
+</div>
+
+<div class="container">
+    <h2 class="title">Services Looking For</h2>
+    @if (servicesLookingFor != null && servicesLookingFor.Any())
+    {
+        <div class="grid">
+            @foreach (var post in servicesLookingFor)
+            {
+                <div class="card">
+                    <img src="@post.User.Worker_Profile?.Image" alt="@post.User.Name">
+                    <h2>
+                        <a class="btn-primary" href="@Url.Action("Profile", "Index", new { userId = post.UserId })">
+                            @post.User.Name
+                        </a>
+                    </h2>
+                    <p>⭐ @post.User.Worker_Profile?.Rating (from reviews)</p>
+                    <p>@post.Description</p>
+                    <p><strong>$@post.Price</strong></p>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No posts available.</p>
+    }
+
+    <h2 class="title">Services Taken</h2>
+    @if (servicesTaken != null && servicesTaken.Any())
+    {
+        <div class="grid">
+            @foreach (var service in servicesTaken)
+            {
+                <div class="card">
+                    <img src="@service.Worker?.User?.Worker_Profile?.Image" alt="@service.Worker?.User?.Name">
+                    <h2>@service.Worker?.User?.Name</h2>
+                    <p>⭐ @service.Worker?.Rating (from reviews)</p>
+                    <p>@service.Review</p>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No services taken.</p>
+    }
+</div>

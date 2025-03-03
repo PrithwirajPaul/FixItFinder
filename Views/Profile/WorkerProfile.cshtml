@@ -1,0 +1,188 @@
+@model FixItFinderDemo.Models.Worker_Profile
+@{
+    var serviceOffering = ViewData["ServiceOffering"] as List<FixItFinderDemo.Models.Post>;
+    var serviceProvided = ViewData["ServiceProvided"] as List<FixItFinderDemo.Models.Service_History>;
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+        color: #333;
+    }
+
+    .profile-container {
+        max-width: 600px;
+        margin: auto;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin-top: 80px;
+        position: relative;
+    }
+
+    .profile-container img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin-bottom: 20px;
+    }
+
+    .profile-container .info {
+        font-size: 18px;
+        margin: 10px 0;
+        color: #333;
+    }
+
+    .profile-container .stars {
+        color: gold;
+        font-size: 24px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 24px;
+    }
+
+    .card {
+        background-color: #3CB371;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s;
+        text-align: center;
+    }
+
+    .card:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
+
+    .card h2 {
+        font-size: 20px;
+        font-weight: bold;
+        color: #fff;
+    }
+
+    .card p {
+        font-size: 14px;
+        color: #f5f5f5;
+    }
+
+    .card .btn {
+        padding: 8px 16px;
+        background-color: #2d6a4f;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .card .btn:hover {
+        background-color: #40916c;
+    }
+
+    .section-title {
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #2d6a4f;
+    }
+
+</style>
+
+<div class="profile-container">
+    <h2>Service Provider</h2>
+    <img src="@Model.Image" alt="Profile Picture">
+
+    <div class="info"><strong>Name:</strong> @Model.User.Name</div>
+    <div class="info"><strong>Email:</strong> @Model.User.Email</div>
+    <div class="info"><strong>Category:</strong> @Model.Category</div>
+    <div class="info"><strong>Experience:</strong> @Model.Experience years</div>
+
+    <div class="info">
+        <strong>Rating:</strong>
+        @if (Model.Rating > 0)
+        {
+            <span class="stars">
+                @for (int i = 0; i < Math.Floor((double)(Model.Rating??0)); i++)
+                {
+                    <i class="fa fa-star"></i> 
+                }
+                @if ((Model.Rating) % 1 != 0)
+                {
+                    <i class="fa fa-star-half-alt"></i>  
+                }
+            </span>
+            <span>@(Model.Rating?.ToString("0.0") ?? "No ratings yet.")</span>
+        }
+        else
+        {
+            <span>No ratings yet.</span>
+        }
+    </div>
+</div>
+
+<div class="container">
+    <h2 class="section-title">Service Offering</h2>
+    @if (serviceOffering != null && serviceOffering.Any())
+    {
+        <div class="grid">
+            @foreach (var post in serviceOffering)
+            {
+                <div class="card">
+                    <img src="@post.User.Worker_Profile?.Image" alt="@post.User.Name">
+                    <h2>
+                        <a asp-controller="Profile" asp-action="Index" asp-route-userId="@post.UserId" class="btn">
+                            @post.User.Name
+                        </a>
+                    </h2>
+                    <p>⭐ @post.User.Worker_Profile?.Rating (from reviews)</p>
+                    <p>@post.Description</p>
+                    <p><strong>$@post.Price</strong></p>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No posts available.</p>
+    }
+
+    <h2 class="section-title">Service Provided</h2>
+    @if (serviceProvided != null && serviceProvided.Any())
+    {
+        <div class="grid">
+            @foreach (var service in serviceProvided)
+            {
+                <div class="card">
+                    <img src="@service.Customer?.User?.Worker_Profile?.Image" alt="@service.Customer?.User?.Name">
+                    <h2>@service.Customer?.User?.Name</h2>
+                    <p>⭐ @service.Customer?.User?.Worker_Profile?.Rating (from reviews)</p>
+                    <p>@service.Review</p>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No services provided.</p>
+    }
+</div>
