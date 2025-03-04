@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -9,7 +9,28 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FixItFinderDemo.styles.css" asp-append-version="true" />
 </head>
-<body>
+<bod
+    <header class="header-container">
+        <div class="header-content">
+            <a href="/" class="logo" aria-label="Go to homepage">
+                FixItFinder
+            </a>
+            <div class="header-buttons">
+                <div class="auth-buttons">
+                    <button class="sign-in-btn" aria-label="Sign in to your account"
+                            onclick="window.location.href='@Url.Action("Login", "Account")'">
+                        Sign In
+                    </button>
+                    <button class="sign-up-btn" aria-label="Sign up for an account"
+                            onclick="window.location.href='@Url.Action("SignUp", "Account")'">
+                        Get Started
+                    </button>
+                </div>
+                <div class="user-button"></div>
+            </div>
+        </div>
+    </header>
+
     
     <div class="container">
         <main role="main" class="pb-3">
@@ -17,14 +38,11 @@
         </main>
     </div>
 
-    @* <footer class="border-top margin-top-55px footer text-muted">  *@
-    @*     <div class="container">  *@
-    @*          &copy; 2025 - fixitfinderdemo - <a asp-area="" asp-controller="home" asp-action="privacy">privacy</a> *@
-    @*      </div> *@
-    @*  </footer>  *@
+    @await RenderSectionAsync("Scripts", required: false)
+
+    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
