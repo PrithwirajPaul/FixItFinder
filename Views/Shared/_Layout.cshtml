@@ -8,6 +8,81 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FixItFinderDemo.styles.css" asp-append-version="true" />
+    <style>
+        .header-container {
+            background-color: #2d6a4f;
+            color: white;
+            padding: 16px 24px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        .search-bar {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            margin: 0 20px;
+        }
+        .search-input {
+            width: 50%;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: none;
+            text-align: center;
+            font-size: 16px;
+        }
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .notification-container {
+            position: relative;
+        }
+        .notification-icon {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+        .notification-dropdown {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background-color: white;
+            color: black;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 4px;
+            width: 200px;
+        }
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+    </style>
 </head>
 <body>
     <header class="header-container">
@@ -15,24 +90,40 @@
             <a href="/" class="logo" aria-label="Go to homepage">
                 FixItFinder
             </a>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search services...">
+            </div>
             <div class="header-buttons">
-                <div class="auth-buttons">
-                    <button class="sign-in-btn" aria-label="Sign in to your account"
-                            onclick="window.location.href='@Url.Action("Login", "Account")'">
-                        Sign In
-                    </button>
-                    <button class="sign-up-btn" aria-label="Sign up for an account"
-                            onclick="window.location.href='@Url.Action("SignUp", "Account")'">
-                        Get Started
-                    </button>
+                <div class="auth-buttons" id="auth-section">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                            <div class="user-profile">
+                                <img src="/path-to-profile-pic.jpg" alt="User Profile" class="profile-pic">
+                            </div>
+                    }
+                    else
+                    {
+                            <button class="sign-in-btn" aria-label="Sign in to your account"
+                                    onclick="window.location.href='@Url.Action("Login", "Account")'">
+                                Sign In
+                            </button>
+                            <button class="sign-up-btn" aria-label="Sign up for an account"
+                                    onclick="window.location.href='@Url.Action("SignUp", "Account")'">
+                                Get Started
+                            </button>
+                    }
                 </div>
-                <div class="user-button"></div>
+                <div class="notification-container">
+                    <button class="notification-icon" id="notification-btn">🔔</button>
+                    <div class="notification-dropdown" id="notification-dropdown">
+                        <p>No new notifications</p>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
 
-    
-    <div class="container">
+    <div class="container" style="padding-top: 80px;">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -40,7 +131,13 @@
 
     @await RenderSectionAsync("Scripts", required: false)
 
-    
+    <script>
+        document.getElementById("notification-btn").addEventListener("click", function () {
+            let dropdown = document.getElementById("notification-dropdown");
+            dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
+        });
+    </script>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
