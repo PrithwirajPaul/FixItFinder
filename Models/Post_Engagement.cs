@@ -8,7 +8,7 @@ namespace FixItFinderDemo.Models
         [Key]
         public int Id { get; set; }
         public int PostId { get; set; }
-        public string Status { get; set; } = null!;
+        public int Status { get; set; } 
         public int EngagedUserId { get; set; }
 
         [ForeignKey("PostId")]

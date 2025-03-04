@@ -22,13 +22,14 @@ namespace FixItFinderDemo.Controllers
         private List<Post> FetchPosts(string category)
         {
             return _context.Posts
-        .Include(p => p.User)
-        .ThenInclude(u => u.Worker_Profile)
-        .Where(p => p.User != null
-                 && p.User.Role == "Service Provider"
-                 && p.User.Worker_Profile != null
-                 && p.User.Worker_Profile.Category == category)
-        .ToList();
+            .Include(p => p.User)
+            .ThenInclude(u => u.Worker_Profile)
+            .Include(p => p.PostEngagements)  
+            .Where(p => p.User != null
+                     && p.User.Role == "Service Provider"
+                     && p.User.Worker_Profile != null
+                     && p.User.Worker_Profile.Category == category)
+            .ToList();
         }
 
         public IActionResult FindAPro()
@@ -45,6 +46,11 @@ namespace FixItFinderDemo.Controllers
 
             ViewBag.UserId = userId;
             ViewBag.Role = role;
+            ViewBag.Category = "Assembler";
+            if(role== "Service Provider")
+            {
+                ViewBag.UserCategory = HttpContext.Session.GetString("UserCategory");
+            }
 
             return View(PostsToShow);
         }
