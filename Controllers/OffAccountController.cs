@@ -20,11 +20,11 @@ namespace FixItFinderDemo.Controllers
         {
             return View();
         }
-        public IActionResult RepairOPage()
+        public IActionResult HouseRepairOPage()
         {
             return View();
         }
-        public IActionResult ElectricOPage()
+        public IActionResult ElectritiansOPage()
         {
             return View();
         }
