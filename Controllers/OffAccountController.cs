@@ -39,3 +39,28 @@ namespace FixItFinderDemo.Controllers
 
             return View(customerPosts);
         }
+        [HttpGet]
+        public IActionResult AssemblyOPage() => ServiceOfferPage("Assembler");
+
+        [HttpGet]
+        public IActionResult MountingOPage() => ServiceOfferPage("Mounter");
+
+        [HttpGet]
+        public IActionResult CleaningOPage() => ServiceOfferPage("Cleaner");
+
+        [HttpGet]
+        public IActionResult HouseRepairOPage() => ServiceOfferPage("Repairer");
+
+        [HttpGet]
+        public IActionResult ElectritiansOPage() => ServiceOfferPage("Electrician");
+
+        [HttpGet]
+        public IActionResult PlumbingOPage() => ServiceOfferPage("Plumber");
+
+        [HttpGet]
+        public IActionResult PainterOPage() => ServiceOfferPage("Painter");
+
+        [HttpGet]
+        public IActionResult CarpenterOPage() => ServiceOfferPage("Carpenter");
+    }
+}
