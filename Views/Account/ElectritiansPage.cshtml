@@ -1,6 +1,10 @@
 ﻿@model List<FixItFinderDemo.Models.Post>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
 @{
-    ViewBag.title = "Find an Electrician";
+    ViewBag.Title = "Select Your Electrician";
+    var currentUserId = HttpContextAccessor.HttpContext?.Session.GetInt32("UserId");
+    var currentUserRole = HttpContextAccessor.HttpContext?.Session.GetString("UserRole");
 }
 
 <style>
@@ -105,7 +109,7 @@
 
 
 <button class="btn-back" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
-@if (ViewBag.role == "Service Provider")
+@if (ViewBag.role == "Customer")
 {
     <div class="create-post">
         <h3>Create a Post</h3>
@@ -124,43 +128,84 @@
         </form>
     </div>
 }
-    <div class="container">
-    <h2 class="mb-4">Select Your Electricians</h2>
+<div class="container">
+    <h2 class="mb-4">Select Your Assembler</h2>
 
     @if (Model != null && Model.Any())
     {
         <div class="grid">
             @foreach (var post in Model)
             {
+                var userEngagement = post.PostEngagements?.FirstOrDefault(e => e.EngagedUserId == currentUserId);
+                bool isPostOwner = post.UserId == currentUserId;
+                bool hasDifferentRoles = post.User.Role != currentUserRole;
+                bool categoryMatches = post.User.Worker_Profile?.Category == ViewBag.Category || currentUserRole == "Customer";
+
                 <div class="card">
-                    <img src="@post.User.Worker_Profile.Image" alt="@post.User.Name">
+                    <img src="@post.User.Worker_Profile?.Image" alt="@post.User.Name">
                     <h2>
                         <a asp-controller="Profile" asp-action="Index" asp-route-userId="@post.UserId">
                             @post.User.Name
                         </a>
                     </h2>
-                    <p>⭐ @post.User.Worker_Profile.Rating (from reviews)</p>
+                    <p>⭐ @post.User.Worker_Profile?.Rating (from reviews)</p>
                     <p>@post.Description</p>
                     <p><strong>$@post.Price</strong></p>
-                    <p>⭐ @post.User.Worker_Profile.Rating (from reviews)</p>
-                    <p>@post.Description</p>
-                    <p><strong>$@post.Price</strong></p>
-                    <div class="post-status
-                        @(post.Post_Status == 0 ? "status-pending" :
-                          post.Post_Status == 1 ? "status-active" :
-                          post.Post_Status == 2 ? "status-completed" :
-                          "status-cancelled")">
-                        @(post.Post_Status == 0 ? "Pending" :
-                            post.Post_Status == 1 ? "Active" :
-                            post.Post_Status == 2 ? "Completed" :
-                            "Cancelled")
+
+                    <div class="status-bar">
+
+                        @if (isPostOwner || !hasDifferentRoles)
+                        {
+                            <span class="btn btn-secondary">
+                                @if (post.Post_Status == 1)
+                                {
+                                    <span> Open for Applications</span>
+                                }
+                                else
+                                {
+                                    @if (post.Post_Status == 2)
+                                    {
+                                        <span>Hired</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Completed</span>
+                                    }
+                                }
+                            </span>
+                        }
+                        else
+                        {
+                            if (userEngagement != null)
+                            {
+                                <span class="btn @(userEngagement.Status == 2 ? "btn-warning" : userEngagement.Status == 3 ? "btn-danger" : "btn-success")">
+                                    @(userEngagement.Status == 2 ? "Pending" :
+                                        userEngagement.Status == 3 ? "Accepted" :
+                                        userEngagement.Status == 4 ? "Rejected" : "Completed")
+                                </span>
+                            }
+                            else
+                            {
+                                if (post.Post_Status == 1 && categoryMatches)
+                                {
+                                    <a asp-controller="PostEngagement" asp-action="Apply" asp-route-postId="@post.PId" class="btn btn-primary">Apply</a>
+                                }
+                                else
+                                {
+                                    <span class="btn btn-secondary">
+                                        @(post.Post_Status == 2 ? "Hired" : "Completed")
+                                    </span>
+                                }
+                            }
+                        }
                     </div>
                 </div>
             }
         </div>
+
     }
     else
     {
         <p>No posts available.</p>
     }
-    </div>
+</div>

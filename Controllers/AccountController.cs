@@ -2,8 +2,6 @@
 using FixItFinderDemo.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -24,12 +22,29 @@ namespace FixItFinderDemo.Controllers
             return _context.Posts
             .Include(p => p.User)
             .ThenInclude(u => u.Worker_Profile)
-            .Include(p => p.PostEngagements)  
+            .Include(p => p.PostEngagements)
             .Where(p => p.User != null
                      && p.User.Role == "Service Provider"
                      && p.User.Worker_Profile != null
                      && p.User.Worker_Profile.Category == category)
             .ToList();
+        }
+
+        public IActionResult ProfsFetchPosts(string category)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            string? role = HttpContext.Session.GetString("UserRole");
+            var PostsToShow = FetchPosts(category);
+
+            ViewBag.UserId = userId;
+            ViewBag.Role = role;
+            ViewBag.Category = category;
+            if (role == "Service Provider")
+            {
+                ViewBag.UserCategory = HttpContext.Session.GetString("UserCategory");
+            }
+
+            return View(PostsToShow);
         }
 
         public IActionResult FindAPro()
@@ -38,99 +53,22 @@ namespace FixItFinderDemo.Controllers
         }
         [HttpGet]
         [Route("Account/AssemblyPage")]
-        public  IActionResult AssemblyPage()
-        {
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            string? role = HttpContext.Session.GetString("UserRole");
-            var PostsToShow = FetchPosts("Assembler");
+        public IActionResult AssemblyPage() { return ProfsFetchPosts("Assembler"); }
 
-            ViewBag.UserId = userId;
-            ViewBag.Role = role;
-            ViewBag.Category = "Assembler";
-            if(role== "Service Provider")
-            {
-                ViewBag.UserCategory = HttpContext.Session.GetString("UserCategory");
-            }
+        public IActionResult MountingPage() { return ProfsFetchPosts("Mounter"); }
 
-            return View(PostsToShow);
-        }
-        public IActionResult MountingPage()
-        {
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            string? role = HttpContext.Session.GetString("UserRole");
-            var PostsToShow = FetchPosts("Mounter");
+        public IActionResult CleaningPage() { return ProfsFetchPosts("Cleaner"); }
 
-            ViewBag.UserId = userId;
-            ViewBag.Role = role;
+        public IActionResult HouseRepairs() { return ProfsFetchPosts("Repairer"); }
 
-            return View(PostsToShow);
-        }
-        public IActionResult CleaningPage()
-        {
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            string? role = HttpContext.Session.GetString("UserRole");
-            var PostsToShow = FetchPosts("Cleaner");
+        public IActionResult ElectritiansPage() { return ProfsFetchPosts("Electrician"); }
 
-            ViewBag.UserId = userId;
-            ViewBag.Role = role;
+        public IActionResult PlumbingPage() { return ProfsFetchPosts("Plumber"); }
 
-            return View(PostsToShow);
-        }
-        public IActionResult HouseRepairs()
-        {
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            string? role = HttpContext.Session.GetString("UserRole");
-            var PostsToShow = FetchPosts("Repairer");
+        public IActionResult PainterPage() { return ProfsFetchPosts("Painter"); }
 
-            ViewBag.UserId = userId;
-            ViewBag.Role = role;
+        public IActionResult CarpenterPage() { return ProfsFetchPosts("Carpenter"); }
 
-            return View(PostsToShow);
-        }
-        public IActionResult ElectritiansPage()
-        {
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            string? role = HttpContext.Session.GetString("UserRole");
-            var PostsToShow = FetchPosts("Electrician");
-
-            ViewBag.UserId = userId;
-            ViewBag.Role = role;
-
-            return View(PostsToShow);
-        }
-        public IActionResult PlumbingPage()
-        {
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            string? role = HttpContext.Session.GetString("UserRole");
-            var PostsToShow = FetchPosts("Plumber");
-
-            ViewBag.UserId = userId;
-            ViewBag.Role = role;
-
-            return View(PostsToShow);
-        }
-        public IActionResult PainterPage()
-        {
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            string? role = HttpContext.Session.GetString("UserRole");
-            var PostsToShow = FetchPosts("Painter");
-
-            ViewBag.UserId = userId;
-            ViewBag.Role = role;
-
-            return View(PostsToShow);
-        }
-        public IActionResult CarpenterPage()
-        {
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            string? role = HttpContext.Session.GetString("UserRole");
-            var PostsToShow = FetchPosts("Carpenter");
-
-            ViewBag.UserId = userId;
-            ViewBag.Role = role;
-
-            return View(PostsToShow);
-        }
         [HttpGet]
         public IActionResult Login()
         {
@@ -138,11 +76,13 @@ namespace FixItFinderDemo.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login( [Bind("Email,Password,Role")] User loginUser)
+        public async Task<IActionResult> Login([Bind("Email,Password,Role")] User loginUser)
         {
             if (ModelState.IsValid)
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginUser.Email && u.Role == loginUser.Role);
+                var user = await _context.Users
+                    .Include(u => u.Worker_Profile).Where(u=>u.Worker_Profile!=null) 
+                    .FirstOrDefaultAsync(u => u.Email == loginUser.Email && u.Role == loginUser.Role);
                 if (user == null)
                 {
                     ModelState.AddModelError("", "No account found with this email and role.");
@@ -157,9 +97,12 @@ namespace FixItFinderDemo.Controllers
                 HttpContext.Session.SetInt32("UserId", user.UId);
                 HttpContext.Session.SetString("UserName", user.Name ?? "Unknown");
                 HttpContext.Session.SetString("UserRole", user.Role);
-                if(user.Role.Equals("Service Provider"))
+                HttpContext.Session.SetString("LoggedIn", "True");
+                HttpContext.Session.SetString("Image","/Customer.jpeg");
+                if (user.Role.Equals("Service Provider"))
                 {
-                    HttpContext.Session.SetString("UserCategory", user.Worker_Profile?.Category ?? "Assembler");
+                    HttpContext.Session.SetString("UserCategory", user.Worker_Profile.Category);
+                    HttpContext.Session.SetString("Image","/ServiceProvider.jpeg");
                 }
 
                 return RedirectToAction("FindAPro", "Account");
@@ -206,7 +149,7 @@ namespace FixItFinderDemo.Controllers
                     var customerProfile = new Customer_Profile
                     {
                         UserId = user.UId,
-                       
+
                     };
                     _context.Customer_Profiles.Add(customerProfile);
                 }
@@ -215,7 +158,7 @@ namespace FixItFinderDemo.Controllers
                     var workerProfile = new Worker_Profile
                     {
                         UserId = user.UId,
-                        Category = model.Category,
+                        Category = model.Category ?? "",
                         Experience = model.Experience ?? 0
                     };
                     _context.Worker_Profiles.Add(workerProfile);
@@ -232,7 +175,7 @@ namespace FixItFinderDemo.Controllers
         [HttpPost]
         [Route("Account/CreatePost")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePost( [Bind("Description,UserId,Price")]Post post)
+        public async Task<IActionResult> CreatePost([Bind("Description,UserId,Price")] Post post)
         {
             if (ModelState.IsValid)
             {

@@ -1,5 +1,13 @@
-﻿
+﻿@model List<FixItFinderDemo.Models.Post>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+
 @{
+    ViewBag.Title = "Offer Your Assembling Skill";
+    var currentUserId = ViewBag.UserId;
+    var currentUserRole = ViewBag.Role;
+    var pageCategory = ViewBag.Category;
+    var UserCategory = ViewBag.UserCategory;
 }
 <style>
         body {
@@ -52,35 +60,161 @@
             font-size: 14px;
             color: #2E8B57;
         }
+
+    .post-status {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: #28a745;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .status-pending {
+        background-color: #f39c12;
+    }
+
+    .status-active {
+        background-color: #28a745;
+    }
+
+    .status-completed {
+        background-color: #3498db;
+    }
+
+    .status-cancelled {
+        background-color: #e74c3c;
+    }
+
+    .create-post {
+        background-color: #222;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 40px;
+    }
+
+        .create-post input,
+        .create-post textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .create-post button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 
-<button class="btn-back" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
-    <div class="container">
-        <h2 class="mb-4">Select Your Assembling Job</h2>
-        <div class="grid">
-            <div class="card">
-                <img src="photo1.PNG" alt="Zayeed Hasan">
-                <h2>Zayeed Hasan</h2>
-                <p>⭐ 4.8 (24 reviews)</p>
-                <p>I want small Assembles for $5.</p>
-                <p><strong>$5</strong></p>
-            </div>
-            <div class="card">
-                <img src="photo2.PNG" alt="Pritwiraj Banik">
-                <h2>Pritwiraj Banik</h2>
-                <p>⭐ 4.5 (18 reviews)</p>
-                <p>I want house and furniture cleaning Budget $500.</p>
-                <p><strong>$500</strong></p>
-            </div>
-            <div class="card">
-                <img src="photo3.PNG" alt="Salim Ullah Sadik">
-                <h2>Salim Ullah Sadik</h2>
-                <p>⭐ 4.9 (32 reviews)</p>
-                <p>Need Deep cleaning services Under $300.</p>
-                <p><strong>$300</strong></p>
-            </div>
-        </div>
-        <div class="mt-4">
-            <button class="btn btn-success">See All Posts</button>
-        </div>
+
+<button class="btn-back" onclick="window.history.back()"><i class="fa fa-arrow-left"></i></button>
+
+@if (ViewBag.Role == "Service Provider" && pageCategory == UserCategory)
+{
+    <div class="create-post">
+        <h3>Create a Post</h3>
+        <form asp-controller="OffAccount" asp-action="CreatePost" method="post">
+            @Html.AntiForgeryToken()
+
+            <textarea name="Description" placeholder="Enter your service description..." required></textarea>
+            <span asp-validation-for="@Model.FirstOrDefault().Description" class="text-danger"></span>
+
+            <input type="hidden" name="UserId" value="@ViewBag.UserId">
+
+            <input type="number" name="Price" placeholder="Enter the price for your service" required step="0.01">
+            <span asp-validation-for="@Model.FirstOrDefault().Price" class="text-danger"></span>
+
+            <button type="submit">Submit Post</button>
+        </form>
     </div>
+}
+
+<div class="container">
+    <h2 class="mb-4">Select Your Assembler</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="grid">
+            @foreach (var post in Model)
+            {
+                var userEngagement = post.PostEngagements?.FirstOrDefault(e => e.EngagedUserId == currentUserId);
+                bool isPostOwner = post.UserId == currentUserId;
+                bool hasDifferentRoles = post.User.Role != currentUserRole;
+                bool categoryMatches = post.User.Worker_Profile?.Category == ViewBag.Category || currentUserRole == "Customer";
+
+                <div class="card">
+                    <img src="@post.User.Worker_Profile?.Image" alt="@post.User.Name">
+                    <h2>
+                        <a asp-controller="Profile" asp-action="Index" asp-route-userId="@post.UserId">
+                            @post.User.Name
+                        </a>
+                    </h2>
+                    <p>⭐ @post.User.Worker_Profile?.Rating (from reviews)</p>
+                    <p>@post.Description</p>
+                    <p><strong>$@post.Price</strong></p>
+
+                    <div class="status-bar">
+                        @if (isPostOwner || !hasDifferentRoles)
+                        {
+                            <span class="btn btn-secondary">
+                                @if (post.Post_Status == 1)
+                                {
+                                    <span> Open for Applications</span>
+                                }
+                                else
+                                {
+                                    @if (post.Post_Status == 2)
+                                    {
+                                        <span>Hired</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Completed</span>
+                                    }
+                                }
+                            </span>
+                        }
+                        else
+                        {
+                            if (userEngagement != null)
+                            {
+                                <span class="btn @(userEngagement.Status == 2 ? "btn-warning" : userEngagement.Status == 3 ? "btn-danger" : "btn-success")">
+                                    @(userEngagement.Status == 2 ? "Pending" :
+                                        userEngagement.Status == 3 ? "Accepted" :
+                                        userEngagement.Status == 4 ? "Rejected" : "Completed")
+                                </span>
+                            }
+                            else
+                            {
+                                if (post.Post_Status == 1 && categoryMatches)
+                                {
+                                    <a asp-controller="PostEngagement" asp-action="Apply" asp-route-postId="@post.PId" class="btn btn-primary">Apply</a>
+                                }
+                                else
+                                {
+                                    <span class="btn btn-secondary">
+                                        @(post.Post_Status == 2 ? "Hired" : "Completed")
+                                    </span>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+    }
+    else
+    {
+        <p>No posts available.</p>
+    }
+</div>

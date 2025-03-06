@@ -154,7 +154,7 @@
                 <div class="card">
                     <img src="@post.User.Worker_Profile?.Image" alt="@post.User.Name">
                     <h2>
-                        <a class="btn-primary" href="@Url.Action("Profile", "Index", new { userId = post.UserId })">
+                        <a asp-controller="Profile" asp-action="Index" asp-route-userId="@post.UserId">
                             @post.User.Name
                         </a>
                     </h2>

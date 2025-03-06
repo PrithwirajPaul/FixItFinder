@@ -1,13 +1,14 @@
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FixItFinderDemo</title>
-    <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FixItFinderDemo.styles.css" asp-append-version="true" />
+
     <style>
         .header-container {
             background-color: #2d6a4f;
@@ -23,6 +24,7 @@
             justify-content: space-between;
             box-sizing: border-box;
         }
+
         .header-content {
             display: flex;
             align-items: center;
@@ -30,32 +32,21 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+
         .logo {
             font-size: 24px;
             font-weight: bold;
             text-decoration: none;
             color: white;
         }
-        .search-bar {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            margin: 0 20px;
-        }
-        .search-input {
-            width: 50%;
-            padding: 8px 12px;
-            border-radius: 20px;
-            border: 1px solid #ccc;
-            text-align: center;
-            font-size: 16px;
-            color: #333;
-        }
+
         .header-buttons {
             display: flex;
+            margin-left:auto;
             align-items: center;
             gap: 16px;
         }
+
         .sign-in-btn {
             background: none;
             border: none;
@@ -64,9 +55,11 @@
             cursor: pointer;
             transition: color 0.3s;
         }
-        .sign-in-btn:hover {
-            color: #588157;
-        }
+
+            .sign-in-btn:hover {
+                color: #588157;
+            }
+
         .sign-up-btn {
             background-color: #40916c;
             border: none;
@@ -77,12 +70,16 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        .sign-up-btn:hover {
-            background-color: #2d6a4f;
-        }
+
+            .sign-up-btn:hover {
+                background-color: #2d6a4f;
+            }
+
         .notification-container {
             position: relative;
+            display: block;
         }
+
         .notification-icon {
             background: none;
             border: none;
@@ -90,6 +87,7 @@
             cursor: pointer;
             color: white;
         }
+
         .notification-dropdown {
             display: none;
             position: absolute;
@@ -100,12 +98,41 @@
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
             padding: 8px;
             border-radius: 4px;
-            width: 200px;
+            width: 250px;
         }
+
         .profile-pic {
             width: 40px;
             height: 40px;
             border-radius: 50%;
+        }
+
+        .notification-item {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+            .notification-item button {
+                margin-top: 5px;
+                padding: 5px;
+                font-size: 14px;
+                cursor: pointer;
+            }
+
+        .accept-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .reject-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -115,34 +142,30 @@
             <a href="/" class="logo" aria-label="Go to homepage">
                 FixItFinder
             </a>
-            @*<div class="search-bar">
-                <input type="text" class="search-input" placeholder="Search services...">
-            </div>*@
+            
             <div class="header-buttons">
                 <div class="auth-buttons" id="auth-section">
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                            <div class="user-profile">
-                                <img src="/path-to-profile-pic.jpg" alt="User Profile" class="profile-pic">
+                     @if (HttpContextAccessor.HttpContext?.Session.GetString("LoggedIn")== "True") 
+                     { 
+                        <div class="user-profile">
+                            <img src=@Context.Session.GetString("Image") alt="User Profile" class="profile-pic">
+                        </div>
+                        <div class="notification-container">
+                            <button class="notification-icon" id="notification-btn">🔔</button>
+                            <div class="notification-dropdown" id="notification-dropdown">
+                                <p>Loading notifications...</p>
                             </div>
-                    }
-                    else
-                    {
-                            <button class="sign-in-btn" aria-label="Sign in to your account"
-                                    onclick="window.location.href='@Url.Action("Login", "Account")'">
-                                Sign In
-                            </button>
-                            <button class="sign-up-btn" aria-label="Sign up for an account"
-                                    onclick="window.location.href='@Url.Action("SignUp", "Account")'">
-                                Get Started
-                            </button>
-                    }
-                </div>
-                <div class="notification-container">
-                    <button class="notification-icon" id="notification-btn">🔔</button>
-                    <div class="notification-dropdown" id="notification-dropdown">
-                        <p>No new notifications</p>
-                    </div>
+                        </div>
+                     } 
+                     else 
+                     { 
+                         <button class="sign-in-btn" onclick="window.location.href='@Url.Action("Login", "Account")'"> 
+                             Sign In 
+                         </button> 
+                         <button class="sign-up-btn" onclick="window.location.href='@Url.Action("SignUp", "Account")'"> 
+                             Get Started 
+                         </button> 
+                     } 
                 </div>
             </div>
         </div>
@@ -153,18 +176,125 @@
             @RenderBody()
         </main>
     </div>
+    <div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Post Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     @await RenderSectionAsync("Scripts", required: false)
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        document.getElementById("notification-btn").addEventListener("click", function () {
-            let dropdown = document.getElementById("notification-dropdown");
-            dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
+        $(document).ready(function () {
+            loadNotifications();
+
+            $("#notification-btn").click(function (event) {
+                event.stopPropagation();
+                $("#notification-dropdown").toggle();
+            });
+
+            $(document).click(function (event) {
+                if (!$(event.target).closest("#notification-btn, #notification-dropdown").length) {
+                    $("#notification-dropdown").hide();
+                }
+            });
+
+            function loadNotifications() {
+                $.ajax({
+                    url: "/PostEngagement/GetNotifications",
+                    type: "GET",
+                    success: function (data) {
+                        if (data.length === 0) {
+                            $("#notification-dropdown").html("<p>No new notifications</p>");
+                        } else {
+                            let html = "";
+                            data.forEach(notification => {
+                                let notificationText = "";
+
+                                if (notification.HasActions) {
+                                    notificationText = `
+                                        <p><strong>${notification.EngagedUserName}</strong> wants to do
+                                        <a href="#" class="view-post" data-post-id="${notification.PostId}">this service</a>.
+                                        Do you want to accept?</p>
+                                        <button class="accept-btn" data-engagement-id="${notification.PostEngagementId}">Accept</button>
+                                        <button class="reject-btn" data-engagement-id="${notification.PostEngagementId}">Reject</button>`;
+                                } else {
+                                    notificationText = `<p><strong>${notification.ServiceProviderName}</strong> has agreed to provide service for
+                                        <a href="#" class="view-post" data-post-id="${notification.PostId}">this</a></p>`;
+                                }
+
+                                html += `<div class='notification-item'>${notificationText}</div>`;
+                            });
+
+                            $("#notification-dropdown").html(html);
+                        }
+                    }
+                });
+            }
+
+            $(document).on("click", ".view-post", function (event) {
+                event.preventDefault();
+                let postId = $(this).data("post-id");
+                openPostModal(postId);
+            });
+
+            function openPostModal(postId) {
+                $.ajax({
+                    url: "/Post/GetPostDetails",
+                    type: "GET",
+                    data: { id: postId },
+                    success: function (data) {
+                        $("#modalTitle").text(data.title);
+                        $("#modalBody").html(data.description);
+                        $("#postModal").modal("show");
+                    },
+                    error: function () {
+                        console.log("Error fetching post details");
+                    }
+                });
+            }
+
+            $(document).on("click", ".accept-btn", function () {
+                let engagementId = $(this).data("engagement-id");
+                $.ajax({
+                    url: "/PostEngagement/AcceptApplication",
+                    type: "POST",
+                    data: { id: engagementId },
+                    success: function () {
+                        alert("Application accepted.");
+                        loadNotifications();
+                    }
+                });
+            });
+
+            $(document).on("click", ".reject-btn", function () {
+                let engagementId = $(this).data("engagement-id");
+                $.ajax({
+                    url: "/PostEngagement/RejectApplication",
+                    type: "POST",
+                    data: { id: engagementId },
+                    success: function () {
+                        alert("Application rejected.");
+                        loadNotifications();
+                    }
+                });
+            });
         });
     </script>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 </body>
 </html>
