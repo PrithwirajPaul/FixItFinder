@@ -12,11 +12,13 @@ namespace FixItFinderDemo.Models
         public int Views { get; set; }
 
         public int Price { get; set; } 
-
+        
+        public Service_History? History { get; set; }
         [Required]
         public int? UserId { get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }
         public List<Post_Engagement>? PostEngagements { get; set; }
+
     }
 }

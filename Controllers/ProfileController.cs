@@ -40,6 +40,7 @@ namespace FixItFinderDemo.Controllers
                 var servicesTaken = await _context.Service_Histories
                     .Where(sh => sh.CustomerId == customer.UserId)
                     .Include(sh => sh.Worker)
+                    .Include(Sh=>Sh.Posts)
                     .ThenInclude(w => w.User)
                     .ToListAsync();
 
@@ -70,6 +71,7 @@ namespace FixItFinderDemo.Controllers
                 var serviceProvided = await _context.Service_Histories
                     .Where(sh => sh.WorkerId == worker.UserId)
                     .Include(sh => sh.Customer)
+                    .Include(Sh => Sh.Posts)
                     .ThenInclude(c => c.User)
                     .ToListAsync();
 

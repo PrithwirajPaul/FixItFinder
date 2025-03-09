@@ -1,7 +1,10 @@
 @model FixItFinderDemo.Models.Customer_Profile
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
     var servicesLookingFor = ViewData["ServicesLookingFor"] as List<FixItFinderDemo.Models.Post>;
     var servicesTaken = ViewData["ServicesTaken"] as List<FixItFinderDemo.Models.Service_History>;
+    var currentUserId = HttpContextAccessor.HttpContext?.Session.GetInt32("UserId");
+    var currentUserRole = HttpContextAccessor.HttpContext?.Session.GetString("UserRole");
 }
 
 <style>
@@ -151,6 +154,11 @@
         <div class="grid">
             @foreach (var post in servicesLookingFor)
             {
+                var userEngagement = post.PostEngagements?.FirstOrDefault(e => e.EngagedUserId == currentUserId);
+                bool isPostOwner = post.UserId == currentUserId;
+                bool hasDifferentRoles = post.User.Role != currentUserRole;
+                bool categoryMatches = post.User.Worker_Profile?.Category == ViewBag.Category || currentUserRole == "Customer";
+
                 <div class="card">
                     <img src="@post.User.Worker_Profile?.Image" alt="@post.User.Name">
                     <h2>
@@ -161,15 +169,52 @@
                     <p>⭐ @post.User.Worker_Profile?.Rating (from reviews)</p>
                     <p>@post.Description</p>
                     <p><strong>$@post.Price</strong></p>
-                    <div class="post-status
-                        @(post.Post_Status == 0 ? "status-pending" :
-                          post.Post_Status == 1 ? "status-active" :
-                          post.Post_Status == 2 ? "status-completed" :
-                          "status-cancelled")">
-                        @(post.Post_Status == 0 ? "Pending" :
-                            post.Post_Status == 1 ? "Active" :
-                            post.Post_Status == 2 ? "Completed" :
-                            "Cancelled")
+
+                    <div class="status-bar">
+                        @if (isPostOwner || !hasDifferentRoles)
+                        {
+                            <span class="btn btn-secondary">
+                                @if (post.Post_Status == 1)
+                                {
+                                    <span> Open for Applications</span>
+                                }
+                                else
+                                {
+                                    @if (post.Post_Status == 2)
+                                    {
+                                        <span>Hired</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Completed</span>
+                                    }
+                                }
+                            </span>
+                        }
+                        else
+                        {
+                            if (userEngagement != null)
+                            {
+                                <span class="btn @(userEngagement.Status == 2 ? "btn-warning" : userEngagement.Status == 3 ? "btn-danger" : "btn-success")">
+                                    @(userEngagement.Status == 2 ? "Pending" :
+                                        userEngagement.Status == 3 ? "Accepted" :
+                                        userEngagement.Status == 4 ? "Rejected" : "Completed")
+                                </span>
+                            }
+                            else
+                            {
+                                if (post.Post_Status == 1 && categoryMatches)
+                                {
+                                    <a asp-controller="PostEngagement" asp-action="Apply" asp-route-postId="@post.PId" class="btn btn-primary">Apply</a>
+                                }
+                                else
+                                {
+                                    <span class="btn btn-secondary">
+                                        @(post.Post_Status == 2 ? "Hired" : "Completed")
+                                    </span>
+                                }
+                            }
+                        }
                     </div>
                 </div>
             }
@@ -184,13 +229,70 @@
     @if (servicesTaken != null && servicesTaken.Any())
     {
         <div class="grid">
-            @foreach (var service in servicesTaken)
+            @foreach (var post in servicesTaken)
             {
+                var userEngagement = post.Posts.PostEngagements?.FirstOrDefault(e => e.EngagedUserId == currentUserId);
+                bool isPostOwner = post.Posts.UserId == currentUserId;
+                bool hasDifferentRoles = post.Posts.User.Role != currentUserRole;
+                bool categoryMatches = post.Posts.User.Worker_Profile?.Category == ViewBag.Category || currentUserRole == "Customer";
+
                 <div class="card">
-                    <img src="@service.Worker?.User?.Worker_Profile?.Image" alt="@service.Worker?.User?.Name">
-                    <h2>@service.Worker?.User?.Name</h2>
-                    <p>⭐ @service.Worker?.Rating (from reviews)</p>
-                    <p>@service.Review</p>
+                    <img src="@post.Posts.User.Worker_Profile?.Image" alt="@post.Posts.User.Name">
+                    <h2>
+                        <a asp-controller="Profile" asp-action="Index" asp-route-userId="@post.Posts.UserId">
+                            @post.Posts.User.Name
+                        </a>
+                    </h2>
+                    <p>⭐ @post.Posts.User.Worker_Profile?.Rating (from reviews)</p>
+                    <p>@post.Posts.Description</p>
+                    <p><strong>$@post.Posts.Price</strong></p>
+
+                    <div class="status-bar">
+                        @if (isPostOwner || !hasDifferentRoles)
+                        {
+                            <span class="btn btn-secondary">
+                                @if (post.Posts.Post_Status == 1)
+                                {
+                                    <span> Open for Applications</span>
+                                }
+                                else
+                                {
+                                    @if (post.Posts.Post_Status == 2)
+                                    {
+                                        <span>Hired</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Completed</span>
+                                    }
+                                }
+                            </span>
+                        }
+                        else
+                        {
+                            if (userEngagement != null)
+                            {
+                                <span class="btn @(userEngagement.Status == 2 ? "btn-warning" : userEngagement.Status == 3 ? "btn-danger" : "btn-success")">
+                                    @(userEngagement.Status == 2 ? "Pending" :
+                                        userEngagement.Status == 3 ? "Accepted" :
+                                        userEngagement.Status == 4 ? "Rejected" : "Completed")
+                                </span>
+                            }
+                            else
+                            {
+                                if (post.Posts.Post_Status == 1 && categoryMatches)
+                                {
+                                    <a asp-controller="PostEngagement" asp-action="Apply" asp-route-postId="@post.Posts.PId" class="btn btn-primary">Apply</a>
+                                }
+                                else
+                                {
+                                    <span class="btn btn-secondary">
+                                        @(post.Posts.Post_Status == 2 ? "Hired" : "Completed")
+                                    </span>
+                                }
+                            }
+                        }
+                    </div>
                 </div>
             }
         </div>

@@ -201,7 +201,7 @@
                             }
                             else
                             {
-                                if (post.Post_Status == 1 && categoryMatches)
+                                if (post.Post_Status == 1)
                                 {
                                     <a asp-controller="PostEngagement" asp-action="Apply" asp-route-postId="@post.PId" class="btn btn-primary">Apply</a>
                                 }

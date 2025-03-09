@@ -23,7 +23,7 @@ namespace FixItFinderDemo.Controllers
             _context.Post_Engagements.Add(newEngagement);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("AssemblyPage", "Account");
+            return Redirect(Request.Headers["Referer"].ToString());
         }
 
         [HttpGet]

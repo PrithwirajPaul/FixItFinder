@@ -43,6 +43,13 @@ namespace FixItFinderDemo.Data
                 .HasOne(s => s.Customer)
                 .WithMany(c => c.Service_Histories)
                 .HasForeignKey(s => s.CustomerId).OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Service_History>()
+               .HasOne(s => s.Posts)
+               .WithOne(p => p.History) 
+               .HasForeignKey<Service_History>(s => s.PostId)
+               .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Post_Engagement>()
                 .HasOne(pe => pe.Post)
                 .WithMany(p => p.PostEngagements)

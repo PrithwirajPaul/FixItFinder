@@ -148,7 +148,7 @@
                      @if (HttpContextAccessor.HttpContext?.Session.GetString("LoggedIn")== "True") 
                      { 
                         <div class="user-profile">
-                            <img src=@Context.Session.GetString("Image") alt="User Profile" class="profile-pic">
+                            <a href=@Url.Action("Index","Profile")><img src=@HttpContextAccessor.HttpContext.Session.GetString("Image") alt="User Profile" class="profile-pic"></a>
                         </div>
                         <div class="notification-container">
                             <button class="notification-icon" id="notification-btn">🔔</button>

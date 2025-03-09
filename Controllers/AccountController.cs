@@ -81,7 +81,7 @@ namespace FixItFinderDemo.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _context.Users
-                    .Include(u => u.Worker_Profile).Where(u=>u.Worker_Profile!=null) 
+                    .Include(u => u.Worker_Profile).Include(u=> u.Customer_Profile) .Where(u=>u.Worker_Profile!=null || u.Customer_Profile!=null)
                     .FirstOrDefaultAsync(u => u.Email == loginUser.Email && u.Role == loginUser.Role);
                 if (user == null)
                 {
@@ -93,19 +93,25 @@ namespace FixItFinderDemo.Controllers
                 {
                     ModelState.AddModelError("", "Invalid password.");
                     return View(loginUser);
-                }
+                }  
+
+                
                 HttpContext.Session.SetInt32("UserId", user.UId);
                 HttpContext.Session.SetString("UserName", user.Name ?? "Unknown");
                 HttpContext.Session.SetString("UserRole", user.Role);
                 HttpContext.Session.SetString("LoggedIn", "True");
-                HttpContext.Session.SetString("Image","/Customer.jpeg");
+                
                 if (user.Role.Equals("Service Provider"))
                 {
                     HttpContext.Session.SetString("UserCategory", user.Worker_Profile.Category);
-                    HttpContext.Session.SetString("Image","/ServiceProvider.jpeg");
+                    HttpContext.Session.SetString("Image",user.Worker_Profile.Image);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("Image", user.Customer_Profile?.Image);
                 }
 
-                return RedirectToAction("FindAPro", "Account");
+                    return RedirectToAction("FindAPro", "Account");
             }
             return View(loginUser);
         }
@@ -149,6 +155,7 @@ namespace FixItFinderDemo.Controllers
                     var customerProfile = new Customer_Profile
                     {
                         UserId = user.UId,
+                        Image = "/images/Customer.jpeg"
 
                     };
                     _context.Customer_Profiles.Add(customerProfile);
@@ -159,7 +166,8 @@ namespace FixItFinderDemo.Controllers
                     {
                         UserId = user.UId,
                         Category = model.Category ?? "",
-                        Experience = model.Experience ?? 0
+                        Experience = model.Experience ?? 0,
+                        Image = "/images/ServiceProvider.jpeg"
                     };
                     _context.Worker_Profiles.Add(workerProfile);
                 }
