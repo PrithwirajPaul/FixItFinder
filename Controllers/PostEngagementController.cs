@@ -17,13 +17,13 @@ namespace FixItFinderDemo.Controllers
             {
                 PostId = postId,
                 EngagedUserId = currentUserId,
-                Status = 2 
+                Status = 2 // Pending
             };
 
             _context.Post_Engagements.Add(newEngagement);
             await _context.SaveChangesAsync();
 
-            return Redirect(Request.Headers["Referer"].ToString());
+            return RedirectToAction("AssemblyPage", "Account");
         }
 
         [HttpGet]
@@ -35,35 +35,31 @@ namespace FixItFinderDemo.Controllers
 
             var notifications = new List<object>();
 
-
             var applications = _context.Post_Engagements
-            .Include(pe => pe.EngagedUser) 
-            .Include(pe => pe.Post)  
-            .ThenInclude(p => p.User) 
-            .Where(pe => pe.Post.UserId == userId && pe.Status == 2)
-            .Select(pe => new
-            {
-                EngagedUserName = pe.EngagedUser.Name ?? "Unknown",
-                PostId = pe.Post.PId,
-                PostTitle = pe.Post.Description ?? "Service",
-                Message = $"{pe.EngagedUser.Name} wants to do <a href='#' class='view-post' data-post-id='{pe.Post.PId}'>this service</a>. Do you want to accept?",
-                PostEngagementId = pe.Id,
-                HasActions = true
-            }).ToList();
+                .Include(pe => pe.EngagedUser)
+                .Include(pe => pe.Post)
+                .ThenInclude(p => p.User)
+                .Where(pe => pe.Post.UserId == userId && pe.Status == 2)
+                .Select(pe => new
+                {
+                    EngagedUserName = pe.EngagedUser.Name ?? "Unknown",
+                    PostId = pe.Post.PId,
+                    PostTitle = pe.Post.Description ?? "Service",
+                    PostEngagementId = pe.Id,
+                    HasActions = true
+                }).ToList();
 
             notifications.AddRange(applications);
 
-
             var acceptances = _context.Post_Engagements
                 .Include(pe => pe.Post)
-                .ThenInclude(p => p.User)  
+                .ThenInclude(p => p.User)
                 .Where(pe => pe.EngagedUserId == userId && pe.Status == 3)
                 .Select(pe => new
                 {
                     ServiceProviderName = pe.Post.User.Name ?? "Unknown",
                     PostId = pe.Post.PId,
                     PostTitle = pe.Post.Description ?? "Service",
-                    Message = $"<strong>{pe.Post.User.Name}</strong> has agreed to provide service for <a href='#' class='view-post' data-post-id='{pe.Post.PId}'>this</a>",
                     PostEngagementId = pe.Id,
                     HasActions = false
                 }).ToList();
@@ -73,7 +69,7 @@ namespace FixItFinderDemo.Controllers
             return Json(notifications);
         }
 
-
+        [HttpPost]
         [HttpPost]
         public IActionResult AcceptApplication(int id)
         {
@@ -81,14 +77,14 @@ namespace FixItFinderDemo.Controllers
             if (engagement == null)
                 return NotFound();
 
-            engagement.Status = 3; 
+            engagement.Status = 3; // Accepted
 
             var otherApplicants = _context.Post_Engagements
                 .Where(pe => pe.PostId == engagement.PostId && pe.Id != id)
                 .ToList();
             foreach (var applicant in otherApplicants)
             {
-                applicant.Status = 4; 
+                applicant.Status = 4; // Rejected
             }
 
             var post = _context.Posts.FirstOrDefault(p => p.PId == engagement.PostId);
@@ -96,7 +92,7 @@ namespace FixItFinderDemo.Controllers
                 post.Post_Status = 2;
 
             _context.SaveChanges();
-            return Ok();
+            return Ok(new { success = true });
         }
 
         [HttpPost]
@@ -106,10 +102,10 @@ namespace FixItFinderDemo.Controllers
             if (engagement == null)
                 return NotFound();
 
-            engagement.Status = 4; 
+            engagement.Status = 4; // Rejected
 
             _context.SaveChanges();
-            return Ok();
+            return Ok(new { success = true });
         }
     }
 }

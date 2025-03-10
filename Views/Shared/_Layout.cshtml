@@ -216,30 +216,33 @@
                     url: "/PostEngagement/GetNotifications",
                     type: "GET",
                     success: function (data) {
-                        if (data.length === 0) {
+                        if (!data || data.length === 0) {
                             $("#notification-dropdown").html("<p>No new notifications</p>");
                         } else {
                             let html = "";
-                            data.forEach(notification => {
+                            data.forEach(function (notification) {
                                 let notificationText = "";
-
                                 if (notification.HasActions) {
                                     notificationText = `
-                                        <p><strong>${notification.EngagedUserName}</strong> wants to do
+                                        <p><strong>${notification.EngagedUserName || "Unknown"}</strong> wants to do
                                         <a href="#" class="view-post" data-post-id="${notification.PostId}">this service</a>.
                                         Do you want to accept?</p>
-                                        <button class="accept-btn" data-engagement-id="${notification.PostEngagementId}">Accept</button>
-                                        <button class="reject-btn" data-engagement-id="${notification.PostEngagementId}">Reject</button>`;
+                                        <button class="accept-btn btn btn-success btn-sm" data-engagement-id="${notification.PostEngagementId}">Accept</button>
+                                        <button class="reject-btn btn btn-danger btn-sm" data-engagement-id="${notification.PostEngagementId}">Reject</button>`;
                                 } else {
                                     notificationText = `<p><strong>${notification.ServiceProviderName}</strong> has agreed to provide service for
-                                        <a href="#" class="view-post" data-post-id="${notification.PostId}">this</a></p>`;
+                                        <a href="#" class="view-post" data-post-id="${notification.PostId}">this</a>
+                                        Do you want to accept?</p>
+                                        <button class="accept-btn btn btn-success btn-sm" data-engagement-id="${notification.PostEngagementId}">Accept</button>
+                                        <button class="reject-btn btn btn-danger btn-sm" data-engagement-id="${notification.PostEngagementId}">Reject</button>`;
                                 }
-
-                                html += `<div class='notification-item'>${notificationText}</div>`;
+                                html += `<div class="notification-item">${notificationText}</div>`;
                             });
-
                             $("#notification-dropdown").html(html);
                         }
+                    },
+                    error: function () {
+                        $("#notification-dropdown").html("<p>Error loading notifications</p>");
                     }
                 });
             }
@@ -268,31 +271,30 @@
 
             $(document).on("click", ".accept-btn", function () {
                 let engagementId = $(this).data("engagement-id");
-                $.ajax({
-                    url: "/PostEngagement/AcceptApplication",
-                    type: "POST",
-                    data: { id: engagementId },
-                    success: function () {
+                $.post("/PostEngagement/AcceptApplication", { id: engagementId }, function (response) {
+                    if (response.success) {
                         alert("Application accepted.");
                         loadNotifications();
                     }
+                }).fail(function () {
+                    alert("Error accepting application.");
                 });
             });
 
             $(document).on("click", ".reject-btn", function () {
                 let engagementId = $(this).data("engagement-id");
-                $.ajax({
-                    url: "/PostEngagement/RejectApplication",
-                    type: "POST",
-                    data: { id: engagementId },
-                    success: function () {
+                $.post("/PostEngagement/RejectApplication", { id: engagementId }, function (response) {
+                    if (response.success) {
                         alert("Application rejected.");
                         loadNotifications();
                     }
+                }).fail(function () {
+                    alert("Error rejecting application.");
                 });
             });
         });
     </script>
+
 
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
