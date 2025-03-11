@@ -49,8 +49,8 @@ To use FixItFinder, follow these steps:
 
 ### Web View
 <div style="display: flex; gap: 10px; justify-content: center;">
-    <img src="assets/assets/Screenshot_2.png" alt="GUI Screenshot 6" width="400" />
-    <img src="assets/assets/Screenshot_3.png" alt="GUI Screenshot 7" width="400" />
+    <img src="assets/Screenshot_2.png" alt="GUI Screenshot 6" width="400" />
+    <img src="assets/Screenshot_3.png" alt="GUI Screenshot 7" width="400" />
 </div>
 
 ### Mobile View
